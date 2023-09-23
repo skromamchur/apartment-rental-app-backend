@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-import { ConfigModule, ConfigService } from "@nestjs/config"
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import {TypeOrmModule} from "@nestjs/typeorm";
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApartmentModule } from './apartment/apartment.module';
 
-import entities from "./typeorm";
-import * as process from "process";
+import entities from './typeorm';
+import * as process from 'process';
 
 @Module({
   imports: [
