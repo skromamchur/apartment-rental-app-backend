@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import {IsNotEmpty} from "class-validator";
+import {ApartmentDealType} from "../types/Appartment";
 
 @Entity()
 export class Apartment {
@@ -7,8 +8,15 @@ export class Apartment {
   id: number;
 
   @Column()
+  price: number;
+
+  @Column()
   @IsNotEmpty()
   state: string;
+
+  @Column()
+  @IsNotEmpty()
+  type :ApartmentDealType;
 
   @Column()
   @IsNotEmpty()
@@ -41,4 +49,7 @@ export class Apartment {
   @Column()
   @IsNotEmpty()
   totalFloors: number;
+
+  @Column({ nullable: true })
+  photo: string;
 }
