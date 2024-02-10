@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsUrl, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 import {ApartmentDealType} from "../types/Appartment";
 
 export class ApartmentDTO {
@@ -17,7 +17,6 @@ export class ApartmentDTO {
 
     floorNumber: number;
 
-
     totalFloors: number;
 
     @IsString()
@@ -26,5 +25,7 @@ export class ApartmentDTO {
 
     @IsString()
     @IsNotEmpty()
-    type : ApartmentDealType
+    type : ApartmentDealType;
+
+    features : string[];
 }

@@ -16,6 +16,9 @@ import { join } from 'path';
 import {GoogleMapsModule} from "./googlemaps/google-maps.module";
 import {GoogleMapsService} from "./googlemaps/google-maps.service";
 import {HttpModule, HttpService} from "@nestjs/axios";
+import {GoogleMapsController} from "./googlemaps/google-maps.controller";
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 
 @Module({
@@ -44,8 +47,10 @@ import {HttpModule, HttpService} from "@nestjs/axios";
           rootPath: join(__dirname, '..', 'uploads'),
           serveRoot: '/uploads'
       }),
+      AuthModule,
+      UsersModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, GoogleMapsController],
   providers: [AppService, GoogleMapsService],
 })
 export class AppModule {}

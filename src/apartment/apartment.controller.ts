@@ -1,16 +1,26 @@
-import {Controller, Get, Post, Body, Param, Delete, UseInterceptors, UploadedFile} from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  UseInterceptors,
+  UploadedFiles,
+  UseGuards, Request
+} from '@nestjs/common';
 import { ApartmentService } from './apartment.service';
 import { Apartment } from '../typeorm/Apartment';
 
 import { NotFoundException } from '@nestjs/common';
 
-import {FileInterceptor} from "@nestjs/platform-express";
+import {FileInterceptor, FilesInterceptor} from "@nestjs/platform-express";
 
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 
 import {ParseArrayPipe} from "@nestjs/common";
-
+import {ApartmentPhoto} from "../typeorm/Apartment-photo";
 import {Query} from "@nestjs/common";
 import {
   APARTMENT_AVAILABLE_COUNT_OF_ROOMS,
@@ -21,12 +31,16 @@ import {
 import {ApartmentDTO} from "../dto/Appartment";
 import {GoogleMapsService} from "../googlemaps/google-maps.service";
 import {ApartmentDealType} from "../types/Appartment";
+import * as process from "process";
+import {AuthGuard} from "../auth/auth.guard";
+import {UsersService} from "../users/users.service";
 
 @Controller('apartments')
 export class ApartmentController {
   constructor(
     private readonly apartmentService: ApartmentService,
     private readonly googleMapsService: GoogleMapsService,
+    private readonly usersService: UsersService
   ) {}
 
   @Get()
@@ -42,6 +56,7 @@ export class ApartmentController {
     @Query('maxFloor') maxFloor: number = APARTMENT_MAX_FLOOR,
     @Query('minSquare') minSquare: number = APARTMENT_MIN_SQUARE,
     @Query('maxSquare') maxSquare: number = APARTMENT_MAX_SQUARE,
+    @Query('sortType') sort: string = 'date'
   ): Promise<Apartment[]> {
     return this.apartmentService.findAll({
       search,
@@ -52,7 +67,8 @@ export class ApartmentController {
       maxFloor,
       minSquare,
       maxSquare,
-      type
+      type,
+      sort
     });
   }
 
@@ -66,8 +82,9 @@ export class ApartmentController {
   }
 
   @Post()
+  @UseGuards(AuthGuard)
   @UseInterceptors(
-    FileInterceptor('photo', {
+      FilesInterceptor('photos', 10, {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
@@ -78,40 +95,62 @@ export class ApartmentController {
           return cb(null, `${randomName}${extname(file.originalname)}`);
         },
       }),
-      preservePath: true,
+      preservePath: false,
     }),
   )
   async create(
     @Body() apartmentData: ApartmentDTO,
-    @UploadedFile() photo: Express.Multer.File,
+    @UploadedFiles() photos: Express.Multer.File[],
+    @Request() req
   ): Promise<Apartment> {
-    const locationId: string = apartmentData.locationId;
+    try {
+      const user = await this.usersService.findOne(req.user.sub);
+      const featureNames = apartmentData.features ?? [];
 
-    const placeDetails =
-      await this.googleMapsService.getPlaceDetails(locationId);
+      const locationId: string = apartmentData.locationId;
 
-    const apartment = new Apartment();
+      const placeDetails = await this.googleMapsService.getPlaceDetails(locationId);
 
-    apartment.square = apartmentData.square;
-    apartment.price = apartmentData.price;
-    apartment.title = apartmentData.title;
-    apartment.description = apartmentData.description;
-    apartment.floorNumber = apartmentData.floorNumber;
-    apartment.totalFloors = apartmentData.totalFloors;
-    apartment.rooms = apartmentData.rooms;
+      const apartment = new Apartment();
 
-    apartment.street = placeDetails.street;
-    apartment.city = placeDetails.city;
-    apartment.state = placeDetails.state;
+      apartment.square = apartmentData.square;
+      apartment.price = apartmentData.price;
+      apartment.title = apartmentData.title;
+      apartment.description = apartmentData.description;
+      apartment.floorNumber = apartmentData.floorNumber;
+      apartment.totalFloors = apartmentData.totalFloors;
+      apartment.rooms = apartmentData.rooms;
+      apartment.locationId = apartmentData.locationId;
 
-    apartment.type = apartmentData.type;
+      apartment.street = placeDetails.street;
+      apartment.city = placeDetails.city;
+      apartment.state = placeDetails.state;
+      apartment.lat = placeDetails.lat;
+      apartment.lng = placeDetails.lng;
 
-    if (photo) {
-      // Отримайте шлях до завантаженого файлу та збережіть його у моделі Apartment
-      apartment.photo = `http://localhost:3000/uploads/${photo.filename}`;
+      apartment.type = apartmentData.type;
+
+      apartment.photos = [];
+
+      apartment.user = user;
+
+      if (photos && photos.length > 0) {
+        photos.forEach((photo, index) => {
+          const apartmentPhoto = new ApartmentPhoto();
+          apartmentPhoto.filename = `${process.env.API_URL}/uploads/${photo.filename}`;
+          apartment.photos.push(apartmentPhoto);
+
+          if (index === 0) {
+            apartment.previewPhotoId = apartmentPhoto.id;
+          }
+        });
+      }
+
+      return this.apartmentService.create(apartment, featureNames);
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
-
-    return this.apartmentService.create(apartment);
   }
 
   @Delete(':id')
