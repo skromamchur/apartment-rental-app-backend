@@ -23,7 +23,9 @@ export class ApartmentService {
     minSquare,
     maxSquare,
     type,
-      sort
+      sort,
+      state,
+      city
   }: {
     search: string;
     minPrice: number;
@@ -35,7 +37,9 @@ export class ApartmentService {
     maxSquare: number;
     type: string[];
     sort : string
-  }): Promise<Apartment[]> {
+    state : string;
+    city : string;
+  }): Promise<any> {
     let order;
 
     if(sort === 'PRICE_ASC')
@@ -51,7 +55,7 @@ export class ApartmentService {
       order = { createdAt: 'DESC'}
     }
 
-    return this.apartmentRepository.find({
+    const data = await  this.apartmentRepository.find({
       where: {
         title: Like(`%${search}%`),
         price: Between(minPrice, maxPrice),
@@ -63,16 +67,51 @@ export class ApartmentService {
       order,
       relations: ['photos', 'user']
     });
+
+    const groupByAndCountArray = (elements, property) => {
+      const dictionary = {};
+
+      const states = elements.map(ap => ap[property])
+
+      states.forEach(state => {
+        if (!dictionary.hasOwnProperty(state)) {
+          dictionary[state] = 1;
+        } else {
+          dictionary[state]++;
+        }
+      })
+
+      const result = []
+
+      Object.keys(dictionary).forEach((key) => {
+        result.push({
+          name : key,
+          count : dictionary[key]
+        })
+      })
+
+      return result;
+    }
+
+    return ({
+      apartments : data.filter(ap => {
+        if(!state){
+          return true;
+        } else {
+          if(!city){
+            return ap.state === state
+          } else return ap.state === state && ap.city === city
+        }
+      }),
+      states : groupByAndCountArray(data, 'state'),
+      cities : groupByAndCountArray(data.filter(ap => ap.state === state), 'city')
+    })
   }
 
   async findOne(id: number): Promise<Apartment> {
     return this.apartmentRepository.findOne({
       where : {id},
-      relations : {
-        photos : true,
-        features : true,
-        user : true
-      }
+      relations : ['user', 'photos', 'features', 'reviews', 'reviews.reviewer']
     });
   }
 

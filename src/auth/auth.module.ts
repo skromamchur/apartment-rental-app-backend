@@ -8,11 +8,13 @@ import { User } from '../typeorm/User';
 
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
+import {Message} from "../typeorm/Message";
+import {Connection} from "../typeorm/Connection";
 
 @Module({
   imports: [
     UsersModule,
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Message, Connection]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'secret',

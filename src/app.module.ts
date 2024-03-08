@@ -19,6 +19,8 @@ import {HttpModule, HttpService} from "@nestjs/axios";
 import {GoogleMapsController} from "./googlemaps/google-maps.controller";
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import {ReviewsModule} from "./reviews/reviews.module";
+import {ConnectionsModule} from "./connections/connections.module";
 
 
 @Module({
@@ -49,6 +51,8 @@ import { UsersModule } from './users/users.module';
       }),
       AuthModule,
       UsersModule,
+      ReviewsModule,
+      ConnectionsModule
   ],
   controllers: [AppController, GoogleMapsController],
   providers: [AppService, GoogleMapsService],

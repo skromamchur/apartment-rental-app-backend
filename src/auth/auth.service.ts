@@ -7,10 +7,10 @@ export class AuthService {
         private readonly usersService: UsersService,
         private readonly jwtService: JwtService,
     ) {}
-    async signIn(signInDto: { username : string; password : string }) {
-        const { username, password } = signInDto;
+    async signIn(signInDto: { email : string; password : string }) {
+        const { email, password } = signInDto;
 
-        const user = await this.usersService.findByEmail(username);
+        const user = await this.usersService.findByEmail(email);
 
         if (!user) {
             throw new UnauthorizedException('Invalid username or password');

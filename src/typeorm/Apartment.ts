@@ -6,6 +6,7 @@ import {OneToMany, OneToOne, JoinColumn, JoinTable, ManyToMany, ManyToOne, Creat
 import {Feature} from "./Feature";
 import {User} from "./User";
 import {BeforeInsert, BeforeUpdate} from "typeorm";
+import {Review} from "./Review";
 
 
 @Entity()
@@ -73,6 +74,13 @@ export class Apartment {
   @JoinTable()
   photos: ApartmentPhoto[];
 
+  @OneToMany(() => Review, review => review.appartment, {
+    cascade: true,
+    onDelete: 'CASCADE'
+  })
+  @JoinTable()
+  reviews: Review[];
+
   @Column({ nullable: true })
   previewPhotoId: number;
 
@@ -86,6 +94,7 @@ export class Apartment {
 
   @Column({ nullable: true, type : "float" })
   pricePerSquare: number;
+
 
   @CreateDateColumn({
     type: 'timestamp with time zone',

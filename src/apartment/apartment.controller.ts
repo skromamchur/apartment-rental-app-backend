@@ -46,6 +46,8 @@ export class ApartmentController {
   @Get()
   async findAll(
     @Query('search') search: string = '',
+    @Query('state') state: string = '',
+    @Query('city') city: string = '',
     @Query('minPrice') minPrice: number = 0,
     @Query('maxPrice') maxPrice: number = APARTMENT_MAX_PRICE,
     @Query('roomCount', new ParseArrayPipe({ items: Number, separator: ',' }))
@@ -68,7 +70,9 @@ export class ApartmentController {
       minSquare,
       maxSquare,
       type,
-      sort
+      sort,
+      state,
+      city
     });
   }
 
@@ -131,6 +135,7 @@ export class ApartmentController {
       apartment.type = apartmentData.type;
 
       apartment.photos = [];
+      apartment.reviews = [];
 
       apartment.user = user;
 
@@ -157,4 +162,9 @@ export class ApartmentController {
   async remove(@Param('id') id: number): Promise<void> {
     return this.apartmentService.remove(id);
   }
+
+  // @Post(':id/reviews')
+  // async review(@Param('id') id: number): Promise<void> {
+  //   return this.apartmentService.remove(id);
+  // }
 }
