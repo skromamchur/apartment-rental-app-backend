@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import {BadRequestException, Injectable} from '@nestjs/common';
 import {User} from "../typeorm/User";
 
 import * as bcrypt from 'bcrypt';
@@ -16,6 +16,10 @@ import {Connection} from "../typeorm/Connection";
 import {InjectDataSource} from "@nestjs/typeorm";
 import {DataSource} from "typeorm";
 
+import {HttpStatus} from "@nestjs/common";
+
+
+import {HttpException} from "@nestjs/common";
 @Injectable()
 export class UsersService {
   constructor(
@@ -36,6 +40,14 @@ export class UsersService {
 
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
+
+    const existingUser = await this.userRepository.findOne({ where : { email}});
+    if (existingUser) {
+      throw new HttpException({
+        statusCode: HttpStatus.FORBIDDEN,
+        error: 'User with this email already exist',
+      }, HttpStatus.FORBIDDEN);
+    }
 
     const user = new User();
     user.email = email;
