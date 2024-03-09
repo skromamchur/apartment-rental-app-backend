@@ -51,7 +51,7 @@ export class UsersService {
       .getRepository(User)
       .createQueryBuilder('user')
       .where({ id: id })
-      .select(['user.id', 'user.firstName', 'user.lastName', 'user.avatar'])
+      .select(['user.id', 'user.firstName', 'user.lastName', 'user.avatar', 'user.email', 'user.phone'])
       .leftJoinAndSelect('user.connections', 'connections')
       .leftJoinAndSelect('user.receivedConnections', 'receivedConnections')
       .leftJoin('connections.from', 'from')
