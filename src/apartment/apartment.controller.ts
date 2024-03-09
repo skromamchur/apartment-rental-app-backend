@@ -14,7 +14,7 @@ import { Apartment } from '../typeorm/Apartment';
 
 import { NotFoundException } from '@nestjs/common';
 
-import {FileInterceptor, FilesInterceptor} from "@nestjs/platform-express";
+import { FilesInterceptor} from "@nestjs/platform-express";
 
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -30,7 +30,6 @@ import {
 } from "../contants/Apartments";
 import {ApartmentDTO} from "../dto/Appartment";
 import {GoogleMapsService} from "../googlemaps/google-maps.service";
-import {ApartmentDealType} from "../types/Appartment";
 import * as process from "process";
 import {AuthGuard} from "../auth/auth.guard";
 import {UsersService} from "../users/users.service";
