@@ -5,22 +5,14 @@ import {
   Body,
   Param,
   Delete,
-  UseInterceptors,
-  UploadedFiles,
-  UseGuards, Request
+  UseGuards,
+  Request
 } from '@nestjs/common';
 import { ApartmentService } from './apartment.service';
 import { Apartment } from '../typeorm/Apartment';
 
 import { NotFoundException } from '@nestjs/common';
-
-import { FilesInterceptor} from "@nestjs/platform-express";
-
-import { diskStorage } from 'multer';
-import { extname } from 'path';
-
 import {ParseArrayPipe} from "@nestjs/common";
-import {ApartmentPhoto} from "../typeorm/Apartment-photo";
 import {Query} from "@nestjs/common";
 import {
   APARTMENT_AVAILABLE_COUNT_OF_ROOMS,
@@ -30,7 +22,6 @@ import {
 } from "../contants/Apartments";
 import {ApartmentDTO} from "../dto/Appartment";
 import {GoogleMapsService} from "../googlemaps/google-maps.service";
-import * as process from "process";
 import {AuthGuard} from "../auth/auth.guard";
 import {UsersService} from "../users/users.service";
 
@@ -86,24 +77,8 @@ export class ApartmentController {
 
   @Post()
   @UseGuards(AuthGuard)
-  @UseInterceptors(
-      FilesInterceptor('photos', 10, {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, cb) => {
-          const randomName = Array(32)
-            .fill(null)
-            .map(() => Math.round(Math.random() * 16).toString(16))
-            .join('');
-          return cb(null, `${randomName}${extname(file.originalname)}`);
-        },
-      }),
-      preservePath: false,
-    }),
-  )
   async create(
     @Body() apartmentData: ApartmentDTO,
-    @UploadedFiles() photos: Express.Multer.File[],
     @Request() req
   ): Promise<Apartment> {
     try {
@@ -138,17 +113,7 @@ export class ApartmentController {
 
       apartment.user = user;
 
-      if (photos && photos.length > 0) {
-        photos.forEach((photo, index) => {
-          const apartmentPhoto = new ApartmentPhoto();
-          apartmentPhoto.filename = `${process.env.API_URL}/uploads/${photo.filename}`;
-          apartment.photos.push(apartmentPhoto);
-
-          if (index === 0) {
-            apartment.previewPhotoId = apartmentPhoto.id;
-          }
-        });
-      }
+      apartment.photos = apartmentData.photos;
 
       return this.apartmentService.create(apartment, featureNames);
     } catch (error) {

@@ -65,7 +65,7 @@ export class ApartmentService {
         type: In(type),
       },
       order,
-      relations: ['photos', 'user']
+      relations: ['user']
     });
 
     const groupByAndCountArray = (elements, property) => {
@@ -111,7 +111,7 @@ export class ApartmentService {
   async findOne(id: number): Promise<Apartment> {
     return this.apartmentRepository.findOne({
       where : {id},
-      relations : ['user', 'photos', 'features', 'reviews', 'reviews.reviewer']
+      relations : ['user', 'features', 'reviews', 'reviews.reviewer']
     });
   }
 

@@ -1,8 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import {IsNotEmpty} from "class-validator";
 import {ApartmentDealType} from "../types/Appartment";
-import {ApartmentPhoto} from "./Apartment-photo";
-import {OneToMany, OneToOne, JoinColumn, JoinTable, ManyToMany, ManyToOne, CreateDateColumn} from "typeorm";
+import {OneToMany, JoinColumn, JoinTable, ManyToMany, ManyToOne, CreateDateColumn} from "typeorm";
 import {Feature} from "./Feature";
 import {User} from "./User";
 import {BeforeInsert, BeforeUpdate} from "typeorm";
@@ -67,12 +66,8 @@ export class Apartment {
   @Column('float')
   lng: number;
 
-  @OneToMany(() => ApartmentPhoto, photo => photo.apartment, {
-    cascade: true,
-    onDelete: 'CASCADE'
-  })
-  @JoinTable()
-  photos: ApartmentPhoto[];
+  @Column('text' , {array : true})
+  photos : string[];
 
   @OneToMany(() => Review, review => review.appartment, {
     cascade: true,

@@ -28,4 +28,6 @@ export class ApartmentDTO {
     type : ApartmentDealType;
 
     features : string[];
+
+    photos: string[]
 }
