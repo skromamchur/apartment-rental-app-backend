@@ -6,6 +6,7 @@ import {Feature} from "./Feature";
 import {User} from "./User";
 import {BeforeInsert, BeforeUpdate} from "typeorm";
 import {Review} from "./Review";
+import {Complaint} from "./Complaint";
 
 
 @Entity()
@@ -60,6 +61,27 @@ export class Apartment {
   @IsNotEmpty()
   locationId : string;
 
+
+  @Column({ default : "deny"})
+  @IsNotEmpty()
+  allowChildren : "allow" | "deny"
+
+  @Column({ default : "цегляний"})
+  @IsNotEmpty()
+  wallsType : "панельний" | "цегляний" | "газоблок"
+
+  @Column({ default : "deny"})
+  @IsNotEmpty()
+  allowPets : "allow" | "deny"
+
+  @Column({ default : "40+"})
+  @IsNotEmpty()
+  buildAge : string;
+
+  @Column({ default : "adjacent"})
+  @IsNotEmpty()
+  plan : "separate" | "adjacent"
+
   @Column('float')
   lat: number;
 
@@ -69,7 +91,7 @@ export class Apartment {
   @Column('text' , {array : true})
   photos : string[];
 
-  @OneToMany(() => Review, review => review.appartment, {
+  @OneToMany(() => Review, review => review.apartment, {
     cascade: true,
     onDelete: 'CASCADE'
   })
@@ -78,6 +100,9 @@ export class Apartment {
 
   @Column({ nullable: true })
   previewPhotoId: number;
+
+  @Column({ default: false, nullable : true })
+  watched: boolean;
 
   @ManyToMany(() => Feature, { cascade: true })
   @JoinTable()
@@ -89,6 +114,13 @@ export class Apartment {
 
   @Column({ nullable: true, type : "float" })
   pricePerSquare: number;
+
+  @OneToMany(() => Complaint, complaint => complaint.apartment, {
+    cascade: true,
+    onDelete: 'CASCADE'
+  })
+  @JoinTable()
+  complaints: Complaint[];
 
 
   @CreateDateColumn({

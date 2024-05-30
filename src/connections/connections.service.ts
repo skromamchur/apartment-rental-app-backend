@@ -42,22 +42,22 @@ export class ConnectionsService {
       connectionId : number,
       userId: number,
       messageDto: { text: string },
-      photos: any[],
+      photos: string[],
   ): Promise<void> {
     try {
       const message = new Message();
       message.text = messageDto.text;
       message.from = await this.userService.findOne(userId);
-      message.photos = [];
+      message.photos = photos;
       message.connection = await this.connectionRepository.findOne({ where : { id : connectionId}})
 
-      if (photos && photos.length > 0) {
-        photos.forEach((photo) => {
-          const messagePhoto = new MessagePhoto();
-          messagePhoto.filename = `${process.env.API_URL}/uploads/${photo.filename}`;
-          message.photos.push(messagePhoto);
-        });
-      }
+      // if (photos && photos.length > 0) {
+      //   photos.forEach((photo) => {
+      //     const messagePhoto = new MessagePhoto();
+      //     messagePhoto.filename = `${process.env.API_URL}/uploads/${photo.filename}`;
+      //     message.photos.push(messagePhoto);
+      //   });
+      // }
 
       await this.messageRepository.save(message);
     } catch (error) {

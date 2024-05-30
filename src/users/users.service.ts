@@ -87,12 +87,16 @@ export class UsersService {
       .leftJoinAndSelect('connections.messages', 'messages')
       .leftJoin('messages.from', 'messageFrom')
       .addSelect(['messageFrom.id'])
-      .leftJoinAndSelect('messages.photos', 'photos')
       .leftJoinAndSelect('receivedConnections.messages', 'receivedMessages')
       .leftJoin('receivedMessages.from', 'receivedMessageFrom')
       .addSelect(['receivedMessageFrom.id'])
-      .leftJoinAndSelect('receivedMessages.photos', 'receivedPhotos')
       .getOne();
+  }
+
+  async findAll(): Promise<User[]>{
+    return this.userRepository.find({
+      relations : ['apartments', 'reports']
+    })
   }
 
   async findByEmail(email: string): Promise<User> {

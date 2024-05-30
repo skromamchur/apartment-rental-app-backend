@@ -65,7 +65,7 @@ export class ApartmentService {
         type: In(type),
       },
       order,
-      relations: ['user']
+      relations: ['user', 'complaints']
     });
 
     const groupByAndCountArray = (elements, property) => {

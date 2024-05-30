@@ -1,9 +1,10 @@
-import {Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinTable} from 'typeorm';
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinTable, CreateDateColumn} from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import {Apartment} from "./Apartment";
 import {Message} from "./Message";
 import {Review} from "./Review";
 import {Connection} from "./Connection";
+import {Complaint} from "./Complaint";
 
 @Entity()
 export class User {
@@ -24,6 +25,9 @@ export class User {
 
     @Column({ nullable : true})
     avatar : string;
+
+    @Column({ default : false})
+    blocked : boolean;
 
     @Column({ nullable : true})
     phone : string;
@@ -54,6 +58,26 @@ export class User {
     })
     @JoinTable()
     receivedConnections: Connection[];
+
+    @OneToMany(() => Complaint, complaint => complaint.user, {
+        cascade: true,
+        onDelete: 'CASCADE'
+    })
+    @JoinTable()
+    complaints: Complaint[];
+
+    @OneToMany(() => Complaint, complaint => complaint.reportedUser, {
+        cascade: true,
+        onDelete: 'CASCADE'
+    })
+    @JoinTable()
+    reports: Complaint[];
+
+    @CreateDateColumn({
+        type: 'timestamp with time zone',
+        default: () => 'CURRENT_TIMESTAMP',
+    })
+    createdAt: Date;
 
     async validatePassword(password: string): Promise<boolean> {
         return bcrypt.compare(password, this.password);

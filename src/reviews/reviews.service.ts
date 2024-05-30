@@ -23,9 +23,15 @@ export class ReviewsService {
 
     review.text = reviewDto.text;
     review.rating = reviewDto.rating;
-    review.appartment =  await this.apartmentService.findOne(apartmentId);
+    review.apartment =  await this.apartmentService.findOne(apartmentId);
     review.reviewer = await this.userService.findOne(reviewerId);
 
     this.reviewRepository.save(review);
+  }
+
+  async findAllReviews(){
+    return await this.reviewRepository.find({
+      relations : ['reviewer', 'apartment']
+    });
   }
 }

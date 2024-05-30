@@ -6,7 +6,8 @@ import {Message} from "./Message";
 import {MessagePhoto} from "./Message-photo";
 import {Review} from "./Review";
 import {Connection} from "./Connection";
+import {Complaint} from "./Complaint";
 
-const entities =  [Apartment, ApartmentPhoto, Feature, User, Message, MessagePhoto, Review, Connection]
+const entities =  [Apartment, ApartmentPhoto, Feature, User, Message, MessagePhoto, Review, Connection, Complaint]
 
 export default entities;

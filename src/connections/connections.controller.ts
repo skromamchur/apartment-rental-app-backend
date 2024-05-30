@@ -26,7 +26,6 @@ export class ConnectionsController {
     @UseGuards(AuthGuard)
     async createConnection(@Request() req, @Param('id') id : number) {
         try {
-            console.log("wrjskjgskg,,,,")
             await this.connectionsService.createConnection(req.user.sub, id);
 
             return { success: true, message: 'Повідомлення відправлено' };
@@ -37,25 +36,9 @@ export class ConnectionsController {
 
     @Post('/messages/:id')
     @UseGuards(AuthGuard)
-    @UseInterceptors(
-        FilesInterceptor('photos', 10, {
-            storage: diskStorage({
-                destination: './uploads',
-                filename: (req, file, cb) => {
-                    const randomName = Array(32)
-                        .fill(null)
-                        .map(() => Math.round(Math.random() * 16).toString(16))
-                        .join('');
-                    return cb(null, `${randomName}${extname(file.originalname)}`);
-                },
-            }),
-            preservePath: false,
-        }),
-    )
-    async sendMessage(@Param('id') connectionId : number,@Body() messageDto: { text : string }, @Request() req, @UploadedFiles() photos: Express.Multer.File[]) {
+    async sendMessage(@Param('id') connectionId : number,@Body() messageDto: { text : string, photos : string[] }, @Request() req, ) {
         try {
-            await this.connectionsService.sendMessage(connectionId, req.user.sub, messageDto, photos);
-            console.log(photos)
+            await this.connectionsService.sendMessage(connectionId, req.user.sub, messageDto, messageDto.photos);
             return { success: true, message: 'Повідомлення відправлено' };
         } catch (error) {
             return { success: false, message: 'Помилка відправлення повідомлення', error: error.message };

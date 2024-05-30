@@ -31,12 +31,8 @@ export class Message {
   })
   connection: Connection;
 
-  @OneToMany(() => MessagePhoto, (photo) => photo.message, {
-    cascade: true,
-    onDelete: 'CASCADE',
-  })
-  @JoinTable()
-  photos: MessagePhoto[];
+  @Column('text' , {array : true, nullable : true})
+  photos : string[];
 
   @CreateDateColumn({
     type: 'timestamp with time zone',

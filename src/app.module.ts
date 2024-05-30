@@ -21,6 +21,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import {ReviewsModule} from "./reviews/reviews.module";
 import {ConnectionsModule} from "./connections/connections.module";
+import {ComplaintsModule} from "./complaints/complaints.module";
 
 
 @Module({
@@ -52,7 +53,8 @@ import {ConnectionsModule} from "./connections/connections.module";
       AuthModule,
       UsersModule,
       ReviewsModule,
-      ConnectionsModule
+      ConnectionsModule,
+      ComplaintsModule
   ],
   controllers: [AppController, GoogleMapsController],
   providers: [AppService, GoogleMapsService],

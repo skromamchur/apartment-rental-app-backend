@@ -24,7 +24,7 @@ export class Review {
     onDelete: 'CASCADE'
   })
   @JoinColumn({ name: 'appartmentId' })
-  appartment: Apartment;
+  apartment: Apartment;
 
   @ManyToOne(() => User, (user) => user.reviews, {
     onDelete: 'CASCADE'
@@ -34,6 +34,9 @@ export class Review {
 
   @Column()
   rating: number;
+
+  @Column({ default : false})
+  checked: boolean;
 
   @CreateDateColumn({
     type: 'timestamp with time zone',
