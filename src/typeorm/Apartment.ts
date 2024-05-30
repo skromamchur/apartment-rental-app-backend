@@ -74,6 +74,10 @@ export class Apartment {
   @IsNotEmpty()
   allowPets : "allow" | "deny"
 
+  @Column({ default : "individual"})
+  @IsNotEmpty()
+  warmingType : "individual" | "center"
+
   @Column({ default : "40+"})
   @IsNotEmpty()
   buildAge : string;
